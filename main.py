@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox, filedialog, ttk
 from pynput import keyboard
+
+
 class KeyRecorder:
 
     def __init__(self):
@@ -74,9 +76,11 @@ class KeyRecorder:
             if key == keyboard.Key.space:
                 self.textbox.insert(tk.END, " ")
                 print('Key pressed: Spacebar')
+                self.root.focus()
             else:
                 self.textbox.insert(tk.END, f"\n{key}\n")
                 print(f'Key pressed: {key}')
+                self.root.focus()
         else:
             try:
                 if key.char and key.char.isalnum():
@@ -105,9 +109,6 @@ class KeyRecorder:
             self.update_status("Recording Inactive")
             self.listener.stop()
             self.recording_active = False
-
-
-
 
 
 KeyRecorder()
