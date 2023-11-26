@@ -11,6 +11,8 @@ class KeyRecorder:
         self.style = ttk.Style()
         self.style.theme_use("clam")
 
+        self.root.configure(bg="#53A7C4")
+
         self.menubar = tk.Menu(self.root)
 
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
@@ -24,10 +26,10 @@ class KeyRecorder:
 
         self.root.config(menu=self.menubar)
 
-        self.label = tk.Label(self.root, text="Keystroke Recorder", font=("Arial", 18))
+        self.label = tk.Label(self.root, text="Keystroke Recorder", font=("Arial", 18), background="#53A7C4")
         self.label.pack(padx=10, pady=10)
 
-        self.textbox = tk.Text(self.root, height=5, font=("Arial", 16))
+        self.textbox = tk.Text(self.root, height=5, font=("Arial", 16), foreground="white", background="black")
         self.textbox.pack(padx=10, pady=10)
 
         buttonframe = ttk.Frame(self.root)
