@@ -1,20 +1,21 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog, ttk
 from pynput import keyboard
-
-
-class MyGUI:
+from PIL import Image, ImageDraw
+class KeyRecorder:
 
     def __init__(self):
 
         self.root = tk.Tk()
+        self.root.title("Keystroke Recorder")
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
 
         self.menubar = tk.Menu(self.root)
 
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="Close?", command=exit)
+        self.filemenu.add_command(label="Exit?", command=exit)
         self.filemenu.add_separator()
-        self.filemenu.add_command(label="Close Without Question", command=exit)
 
         self.actionmenu = tk.Menu(self.menubar, tearoff=0)
 
@@ -27,32 +28,34 @@ class MyGUI:
         self.label.pack(padx=10, pady=10)
 
         self.textbox = tk.Text(self.root, height=5, font=("Arial", 16))
-        self.textbox.bind("<KeyPress>", self.shortcut)
         self.textbox.pack(padx=10, pady=10)
 
-        self.check_state = tk.IntVar()
+        buttonframe = ttk.Frame(self.root)
+        buttonframe.pack()
+        buttonframe.rowconfigure(0, weight=1)
+        buttonframe.rowconfigure(1, weight=2)
+        buttonframe.rowconfigure(2, weight=3)
 
-        self.check = tk.Checkbutton(self.root, text="Show Messagebox", font=("Arial", 18), variable=self.check_state)
-        self.check.pack(padx=10, pady=10)
+        self.recordKeystrokes = ttk.Button(buttonframe, text="Record Keystrokes", command=self.record_keystrokes)
+        self.recordKeystrokes.grid(row=0, column=0, sticky=tk.W+tk.E)
 
-        self.recordKeystrokes = tk.Button(self.root, text="Record Keystrokes", font=("Arial", 18),
-                                          command=self.record_keystrokes)
-        self.recordKeystrokes.pack(padx=10,pady=10)
+        self.clearButton = ttk.Button(buttonframe, text="Clear", command=self.clear_recording)
+        self.clearButton.grid(row=0, column=1, sticky=tk.W+tk.E)
 
-        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.writeButton = ttk.Button(buttonframe, text="Write to File", command=self.write_to_file)
+        self.writeButton.grid(row=0, column=2, sticky=tk.W+tk.E)
+
+        self.root.protocol("WM_DELETE_WINDOW", self.close_app)
         self.root.mainloop()
 
-    def shortcut(self, event):
-        if event.state == 4 and event.keysym == "Return":
-            self.show_message()
-
-    def on_closing(self):
-        if messagebox.askyesno(title="Quit?", message="Do you really want to quit?"):
+    def close_app(self):
+        if messagebox.askyesno(title="Close Application?", message="Are you sure you want to exit?"):
             self.root.destroy()
 
     def record_keystrokes(self):
-        self.listener = keyboard.Listener(on_press=self.on_key_press)
-        self.listener.start()
+        if not hasattr(self, "listener") or not self.listener.is_alive():
+            self.listener = keyboard.Listener(on_press=self.on_key_press)
+            self.listener.start()
 
     def on_key_press(self, key):
         if isinstance(key, keyboard.Key):
@@ -70,4 +73,17 @@ class MyGUI:
             except AttributeError:
                 pass
 
-MyGUI()
+    def clear_recording(self):
+        self.textbox.delete("1.0", tk.END)
+
+    def write_to_file(self):
+        text_content = self.textbox.get("1.0", tk.END)
+        if text_content.strip():
+            file_path = filedialog.asksaveasfilename(defaultextension=".txt",
+                                                     filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
+            if file_path:
+                with open(file_path, "w") as file:
+                    file.write(text_content)
+
+
+KeyRecorder()
