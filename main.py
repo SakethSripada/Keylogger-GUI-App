@@ -11,6 +11,7 @@ class KeyRecorder:
         self.root.title("Keystroke Recorder")
         self.style = ttk.Style()
         self.style.theme_use("clam")
+        self.root.geometry("800x350")
 
         self.root.configure(bg="white")
 
